@@ -1,0 +1,39 @@
+#employ subqueries to the local knowledge base for all  
+traits recorded for the Baobab (Subquery 1) and to a remote SPARQL endpoint, the UniProt knowledgebase (UniProt Consortium 2017), for all protein data for the same species (Subquery 2).
+
+PREFIX up:<http://purl.uniprot.org/core/>
+PREFIX taxon:<http://purl.uniprot.org/taxonomy/>
+PREFIX FLOPO: <http://purl.obolibrary.org/obo/FLOPO_>
+PREFIX RO: <http://purl.obolibrary.org/obo/RO_>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?organism ?trait ?protein
+WHERE
+{
+# Subquery 1
+{
+SELECT DISTINCT ?trait
+FROM <http://semantics.senckenberg.de/flopo>
+WHERE
+  {
+  ?taxon_uri rdfs:label ?species_name ;
+  RO:0002200 ?FLOPO_term .
+  ?FLOPO_term rdfs:label ?trait .
+  # filter function to match the scientific name	 
+  FILTER (regex(?species_name, "adansonia digit", "i"))
+  }}
+# Subquery 2
+{
+SELECT ?organism ?protein
+WHERE
+{
+SERVICE <https://sparql.uniprot.org/SPARQL>
+{
+SELECT ?organism ?protein
+WHERE
+{
+?organism up:scientificName "Adansonia digitata" .
+?protein a up:Protein ;
+up:organism ?organism .
+}}}}
+}

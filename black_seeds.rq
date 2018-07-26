@@ -1,0 +1,17 @@
+#Obtain all species with black seeds from semantics.senckenberg.de
+
+PREFIX FLOPO: <http://purl.obolibrary.org/obo/FLOPO_>
+PREFIX RO: <http://purl.obolibrary.org/obo/RO_>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dwc: <http://rs.tdwg.org/dwc/terms/>
+PREFIX gbifvoc: <http://rs.gbif.org/vocabulary/gbif/rank/>
+
+SELECT ?species_name ?taxon_uri
+FROM <http://semantics.senckenberg.de/flopo>
+WHERE
+{
+?taxon_uri RO:0002200 FLOPO:0006696 ;
+rdfs:label ?species_name ;
+# only species, no higher taxa:
+dwc:taxonRank gbifvoc:species . 
+}
